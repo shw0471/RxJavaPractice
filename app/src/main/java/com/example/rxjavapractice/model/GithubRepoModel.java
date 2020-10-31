@@ -2,6 +2,9 @@ package com.example.rxjavapractice.model;
 
 import com.example.rxjavapractice.callback.GithubRepoModelListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -27,6 +30,17 @@ public class GithubRepoModel {
         githubService.getGithubRepo(userID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(githubRepo -> callback.loadList(githubRepo));
+                .subscribe(githubRepo -> {
+                    callback.loadList(githubRepo);
+                }, e -> {
+                    List<GithubRepo> githubRepoList = new ArrayList<>();
+                    GithubRepo githubRepo = new GithubRepo();
+
+                    githubRepo.setName("Wrong ID");
+                    githubRepo.setCreated_at("please check the Github ID");
+                    githubRepoList.add(githubRepo);
+
+                    callback.loadList(githubRepoList);
+                });
     }
 }
